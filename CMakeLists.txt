@@ -1,6 +1,22 @@
-cmake_minimum_required(VERSION 4.0)
-project(untitled6)
+cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_CXX_STANDARD 20)
+project(untitled6 VERSION 1.0 LANGUAGES CXX)
 
-add_executable(untitled6 main.cpp)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
+
+qt_standard_project_setup()
+
+qt_add_executable(untitled6
+        main.cpp
+        mainwindow.cpp
+        mainwindow.h
+        bot.h
+        bot.cpp
+)
+
+target_link_libraries(untitled6
+        PRIVATE Qt6::Widgets
+)
