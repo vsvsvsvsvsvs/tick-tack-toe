@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QComboBox>
+#include <QLabel>
 #include "bot.h"
 
 class MainWindow : public QMainWindow
@@ -17,6 +18,7 @@ public:
 private slots:
     void handleButtonClick();
     void changeDifficulty(int index);
+    void changeMode(int index);
 
 private:
     static const int SIZE = 10;
@@ -26,14 +28,20 @@ private:
     char board[SIZE][SIZE];
 
     QComboBox* difficultyBox;
+    QComboBox* modeBox;
+    QLabel* turnLabel;
 
     Bot::Difficulty currentDifficulty;
+
+    bool isPvP = false;
+    char currentPlayer = 'X';
 
     void createBoard();
     void botMove();
     bool checkWin(char symbol);
     bool isBoardFull();
     void resetGame();
+    void updateTurnLabel();
 };
 
 #endif // MAINWINDOW_H

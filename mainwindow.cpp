@@ -1,18 +1,15 @@
 #include "mainwindow.h"
-#include "bot.h"
 
 #include <QGridLayout>
 #include <QMessageBox>
 #include <QWidget>
 #include <QVBoxLayout>
-#include <QComboBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     createBoard();
 
-    // Уровень сложности по умолчанию
     currentDifficulty = Bot::Random;
 }
 
@@ -23,12 +20,24 @@ MainWindow::~MainWindow()
 void MainWindow::createBoard()
 {
     QWidget *central = new QWidget(this);
-
     QVBoxLayout *mainLayout = new QVBoxLayout(central);
 
-    // Выпадающий список сложности
-    difficultyBox = new QComboBox();
+    // ===== РЕЖИМ ИГРЫ =====
+    modeBox = new QComboBox();
+    modeBox->addItem("Player vs Bot");
+    modeBox->addItem("Player vs Player");
 
+    connect(
+        modeBox,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        &MainWindow::changeMode
+    );
+
+    mainLayout->addWidget(modeBox);
+
+    // ===== СЛОЖНОСТЬ =====
+    difficultyBox = new QComboBox();
     difficultyBox->addItem("Random");
     difficultyBox->addItem("Greedy");
     difficultyBox->addItem("Minimax");
@@ -43,7 +52,12 @@ void MainWindow::createBoard()
 
     mainLayout->addWidget(difficultyBox);
 
-    // Игровое поле
+    // ===== ИНДИКАТОР ХОДА =====
+    turnLabel = new QLabel();
+    turnLabel->setText("Ход: X");
+    mainLayout->addWidget(turnLabel);
+
+    // ===== ПОЛЕ =====
     QGridLayout *gridLayout = new QGridLayout();
 
     for (int i = 0; i < SIZE; i++)
@@ -70,7 +84,7 @@ void MainWindow::createBoard()
 
     setCentralWidget(central);
     setWindowTitle("Крестики-нолики 10x10");
-    resize(700, 750);
+    resize(700, 800);
 }
 
 void MainWindow::handleButtonClick()
@@ -87,57 +101,67 @@ void MainWindow::handleButtonClick()
         {
             if (buttons[i][j] == clicked && board[i][j] == ' ')
             {
-                // Ход игрока
+                // ===== PvP режим =====
+                if (isPvP)
+                {
+                    board[i][j] = currentPlayer;
+                    buttons[i][j]->setText(QString(currentPlayer));
+
+                    if (checkWin(currentPlayer))
+                    {
+                        QMessageBox::information(
+                            this,
+                            "Победа",
+                            QString("Игрок %1 победил!").arg(currentPlayer)
+                        );
+                        resetGame();
+                        return;
+                    }
+
+                    if (isBoardFull())
+                    {
+                        QMessageBox::information(this, "Ничья", "Поле заполнено!");
+                        resetGame();
+                        return;
+                    }
+
+                    // смена игрока
+                    currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+                    updateTurnLabel();
+
+                    return;
+                }
+
+                // ===== PvBot =====
                 board[i][j] = 'X';
                 buttons[i][j]->setText("X");
 
                 if (checkWin('X'))
                 {
-                    QMessageBox::information(
-                        this,
-                        "Победа",
-                        "Игрок победил!"
-                    );
-
+                    QMessageBox::information(this, "Победа", "Игрок победил!");
                     resetGame();
                     return;
                 }
 
                 if (isBoardFull())
                 {
-                    QMessageBox::information(
-                        this,
-                        "Ничья",
-                        "Поле заполнено!"
-                    );
-
+                    QMessageBox::information(this, "Ничья", "Поле заполнено!");
                     resetGame();
                     return;
                 }
 
-                // Ход бота
                 botMove();
 
                 if (checkWin('O'))
                 {
-                    QMessageBox::information(
-                        this,
-                        "Поражение",
-                        "Бот победил!"
-                    );
-
+                    QMessageBox::information(this, "Поражение", "Бот победил!");
                     resetGame();
                     return;
                 }
 
                 if (isBoardFull())
                 {
-                    QMessageBox::information(
-                        this,
-                        "Ничья",
-                        "Поле заполнено!"
-                    );
-
+                    QMessageBox::information(this, "Ничья", "Поле заполнено!");
                     resetGame();
                     return;
                 }
@@ -163,102 +187,76 @@ void MainWindow::botMove()
     buttons[x][y]->setText("O");
 }
 
+void MainWindow::updateTurnLabel()
+{
+    turnLabel->setText(QString("Ход: %1").arg(currentPlayer));
+}
+
+void MainWindow::changeMode(int index)
+{
+    isPvP = (index == 1);
+    resetGame();
+}
+
+void MainWindow::changeDifficulty(int index)
+{
+    switch (index)
+    {
+        case 0: currentDifficulty = Bot::Random; break;
+        case 1: currentDifficulty = Bot::Greedy; break;
+        case 2: currentDifficulty = Bot::Minimax; break;
+        case 3: currentDifficulty = Bot::AlphaBeta; break;
+    }
+}
+
 bool MainWindow::checkWin(char symbol)
 {
     for (int i = 0; i < SIZE; i++)
     {
         for (int j = 0; j < SIZE; j++)
         {
-            // Горизонталь
             if (j + WIN_COUNT <= SIZE)
             {
                 bool win = true;
-
                 for (int k = 0; k < WIN_COUNT; k++)
-                {
-                    if (board[i][j + k] != symbol)
-                    {
-                        win = false;
-                        break;
-                    }
-                }
-
-                if (win)
-                    return true;
+                    if (board[i][j + k] != symbol) win = false;
+                if (win) return true;
             }
 
-            // Вертикаль
             if (i + WIN_COUNT <= SIZE)
             {
                 bool win = true;
-
                 for (int k = 0; k < WIN_COUNT; k++)
-                {
-                    if (board[i + k][j] != symbol)
-                    {
-                        win = false;
-                        break;
-                    }
-                }
-
-                if (win)
-                    return true;
+                    if (board[i + k][j] != symbol) win = false;
+                if (win) return true;
             }
 
-            // Главная диагональ
-            if (i + WIN_COUNT <= SIZE &&
-                j + WIN_COUNT <= SIZE)
+            if (i + WIN_COUNT <= SIZE && j + WIN_COUNT <= SIZE)
             {
                 bool win = true;
-
                 for (int k = 0; k < WIN_COUNT; k++)
-                {
-                    if (board[i + k][j + k] != symbol)
-                    {
-                        win = false;
-                        break;
-                    }
-                }
-
-                if (win)
-                    return true;
+                    if (board[i + k][j + k] != symbol) win = false;
+                if (win) return true;
             }
 
-            // Побочная диагональ
-            if (i + WIN_COUNT <= SIZE &&
-                j - WIN_COUNT + 1 >= 0)
+            if (i + WIN_COUNT <= SIZE && j - WIN_COUNT + 1 >= 0)
             {
                 bool win = true;
-
                 for (int k = 0; k < WIN_COUNT; k++)
-                {
-                    if (board[i + k][j - k] != symbol)
-                    {
-                        win = false;
-                        break;
-                    }
-                }
-
-                if (win)
-                    return true;
+                    if (board[i + k][j - k] != symbol) win = false;
+                if (win) return true;
             }
         }
     }
-
     return false;
 }
 
 bool MainWindow::isBoardFull()
 {
     for (int i = 0; i < SIZE; i++)
-    {
         for (int j = 0; j < SIZE; j++)
-        {
             if (board[i][j] == ' ')
                 return false;
-        }
-    }
-
     return true;
 }
 
@@ -272,30 +270,7 @@ void MainWindow::resetGame()
             buttons[i][j]->setText("");
         }
     }
-}
 
-void MainWindow::changeDifficulty(int index)
-{
-    switch (index)
-    {
-        case 0:
-            currentDifficulty = Bot::Random;
-            break;
-
-        case 1:
-            currentDifficulty = Bot::Greedy;
-            break;
-
-        case 2:
-            currentDifficulty = Bot::Minimax;
-            break;
-
-        case 3:
-            currentDifficulty = Bot::AlphaBeta;
-            break;
-
-        default:
-            currentDifficulty = Bot::Random;
-            break;
-    }
+    currentPlayer = 'X';
+    updateTurnLabel();
 }
