@@ -4,21 +4,11 @@
 #include <QPair>
 #include <QVector>
 
-class Bot
-{
+class Bot {
 public:
-    enum Difficulty
-    {
-        Random = 1,
-        Greedy = 2,
-        Minimax = 3,
-        AlphaBeta = 4
-    };
+    enum Difficulty { Random = 1, Greedy = 2, Minimax = 3, AlphaBeta = 4 };
 
-    static QPair<int, int> makeMove(
-        char board[10][10],
-        Difficulty level
-    );
+    static QPair<int, int> makeMove(char board[10][10], Difficulty level);
 
 private:
     static const int SIZE = 10;
@@ -31,19 +21,10 @@ private:
     static QPair<int, int> minimaxMove(char board[SIZE][SIZE]);
     static QPair<int, int> alphaBetaMove(char board[SIZE][SIZE]);
 
-    static QVector<QPair<int, int>> generateCandidateMoves(
-        char board[SIZE][SIZE]
-    );
+    static QVector<QPair<int, int>> generateCandidateMoves(char board[SIZE][SIZE]);
 
-    static int alphaBeta(
-        char board[SIZE][SIZE],
-        int depth,
-        int alpha,
-        int beta,
-        bool isMaximizing,
-        int lastX,
-        int lastY
-    );
+    static int alphaBeta(char board[SIZE][SIZE], int depth, int alpha, int beta, bool isMaximizing, int lastX,
+                         int lastY);
 
     static bool isBoardFull(char board[SIZE][SIZE]);
 };

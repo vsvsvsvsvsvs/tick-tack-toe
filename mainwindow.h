@@ -1,14 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QPushButton>
 #include <QComboBox>
 #include <QLabel>
+#include <QMainWindow>
+#include <QPushButton>
 #include "bot.h"
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -16,7 +15,7 @@ public:
     ~MainWindow();
 
 private:
-    QComboBox* sideBox;
+    QComboBox *sideBox;
 
     char playerSymbol = 'X';
     char botSymbol = 'O';
@@ -28,12 +27,12 @@ private:
     static const int SIZE = 10;
     static const int WIN_COUNT = 5;
 
-    QPushButton* buttons[SIZE][SIZE];
+    QPushButton *buttons[SIZE][SIZE];
     char board[SIZE][SIZE];
 
-    QComboBox* difficultyBox;
-    QComboBox* modeBox;
-    QLabel* turnLabel;
+    QComboBox *difficultyBox;
+    QComboBox *modeBox;
+    QLabel *turnLabel;
 
     Bot::Difficulty currentDifficulty;
 
