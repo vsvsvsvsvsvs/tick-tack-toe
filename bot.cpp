@@ -98,16 +98,16 @@ namespace {
                 openEnds++;
 
             if (count >= 5)
-                total += 1000000;
+                total += 100000000;
 
             else if (count == 4) {
                 if (openEnds == 2)
-                    total += 100000;
+                    total += 100000000;
                 else if (openEnds == 1)
-                    total += 10000;
+                    total += 100000;
             } else if (count == 3) {
                 if (openEnds == 2)
-                    total += 8000;
+                    total += 10000;
                 else if (openEnds == 1)
                     total += 500;
             } else if (count == 2) {
@@ -130,7 +130,7 @@ namespace {
                     score += evaluateMove(board, i, j, 'O');
 
                 else if (board[i][j] == 'X')
-                    score -= static_cast<int>(static_cast<double>(evaluateMove(board, i, j, 'X')) * 1.5);
+                    score -= static_cast<int>(static_cast<double>(evaluateMove(board, i, j, 'X')) * 2);
             }
 
         return score;
@@ -313,9 +313,33 @@ QPair<int, int> Bot::alphaBetaMove(char board[SIZE][SIZE]) {
         return block;
 
     // 🔥 блок угроз
+    // 🔥 блок угроз (умный выбор, а не первая попавшаяся)
     auto threats = findAllThreats(board, 'X');
     if (!threats.isEmpty())
-        return threats[0];
+    {
+        int bestScore = -1e9;
+        QPair<int,int> best = threats[0];
+
+        for (auto& t : threats)
+        {
+            int x = t.first;
+            int y = t.second;
+
+            board[x][y] = 'O';
+
+            int score = evaluateBoard(board);
+
+            board[x][y] = ' ';
+
+            if (score > bestScore)
+            {
+                bestScore = score;
+                best = t;
+            }
+        }
+
+        return best;
+    }
 
     int bestScore = -1e9;
     QPair<int, int> best{-1, -1};
