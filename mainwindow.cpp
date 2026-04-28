@@ -50,6 +50,39 @@ void MainWindow::createBoard()
 
     mainLayout->addWidget(difficultyBox);
 
+    sideBox = new QComboBox();
+    sideBox->addItem("Играть за X");
+    sideBox->addItem("Играть за O");
+
+    connect(
+        sideBox,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        [this](int index)
+        {
+            if (index == 0)
+            {
+                playerSymbol = 'X';
+                botSymbol = 'O';
+            }
+            else
+            {
+                playerSymbol = 'O';
+                botSymbol = 'X';
+            }
+
+            resetGame();
+
+            // если бот ходит первым
+            if (!isPvP && playerSymbol == 'O')
+            {
+                botMove();
+            }
+        }
+    );
+
+    mainLayout->addWidget(sideBox);
+
     turnLabel = new QLabel();
     turnLabel->setText("Ход: X");
     mainLayout->addWidget(turnLabel);
@@ -126,10 +159,10 @@ void MainWindow::handleButtonClick()
                     return;
                 }
 
-                board[i][j] = 'X';
-                buttons[i][j]->setText("X");
+                board[i][j] = playerSymbol;
+                buttons[i][j]->setText(QString(playerSymbol));
 
-                if (checkWin('X'))
+                if (checkWin(playerSymbol))
                 {
                     QMessageBox::information(this, "Победа", "Игрок победил!");
                     resetGame();
@@ -145,7 +178,7 @@ void MainWindow::handleButtonClick()
 
                 botMove();
 
-                if (checkWin('O'))
+                if (checkWin(botSymbol))
                 {
                     QMessageBox::information(this, "Поражение", "Бот победил!");
                     resetGame();
@@ -176,8 +209,8 @@ void MainWindow::botMove()
     if (x == -1 || y == -1)
         return;
 
-    board[x][y] = 'O';
-    buttons[x][y]->setText("O");
+    board[x][y] = botSymbol;
+    buttons[x][y]->setText(QString(botSymbol));
 }
 
 void MainWindow::updateTurnLabel()
@@ -189,6 +222,11 @@ void MainWindow::changeMode(int index)
 {
     isPvP = (index == 1);
     resetGame();
+
+    if (!isPvP && playerSymbol == 'O')
+    {
+        botMove();
+    }
 }
 
 void MainWindow::changeDifficulty(int index)

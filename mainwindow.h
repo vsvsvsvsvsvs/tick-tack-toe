@@ -16,6 +16,11 @@ public:
     ~MainWindow();
 
 private:
+    QComboBox* sideBox;
+
+    char playerSymbol = 'X';
+    char botSymbol = 'O';
+
     void handleButtonClick();
     void changeDifficulty(int index);
     void changeMode(int index);
