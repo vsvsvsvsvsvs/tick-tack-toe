@@ -7,7 +7,6 @@
 namespace
 {
     const int size = 10;
-    // ===================== ZOBRIST =====================
     uint64_t zobrist[size][size][2];
     bool zobristInitialized = false;
 
@@ -47,7 +46,6 @@ namespace
 
     QHash<uint64_t, int> transpositionTable;
 
-    // ===================== FAST WIN CHECK =====================
     bool quickCheckWin(char board[size][size], int x, int y, char symbol)
     {
         const int dirs[4][2] = {
@@ -82,7 +80,6 @@ namespace
         return false;
     }
 
-    // ===================== LOCAL EVALUATION =====================
     int evaluateMove(char board[size][size], int x, int y, char symbol)
     {
         const int dirs[4][2] = {
@@ -126,7 +123,6 @@ namespace
     }
 }
 
-// ===================== PUBLIC =====================
 
 QPair<int, int> Bot::makeMove(char board[SIZE][SIZE], Difficulty level)
 {
@@ -143,8 +139,6 @@ QPair<int, int> Bot::makeMove(char board[SIZE][SIZE], Difficulty level)
     return randomMove(board);
 }
 
-// ===================== RANDOM =====================
-
 QPair<int, int> Bot::randomMove(char board[SIZE][SIZE])
 {
     QVector<QPair<int,int>> empty;
@@ -158,8 +152,6 @@ QPair<int, int> Bot::randomMove(char board[SIZE][SIZE])
 
     return empty[QRandomGenerator::global()->bounded(empty.size())];
 }
-
-// ===================== MOVES =====================
 
 QVector<QPair<int,int>> Bot::generateCandidateMoves(char board[SIZE][SIZE])
 {
@@ -202,8 +194,6 @@ QVector<QPair<int,int>> Bot::generateCandidateMoves(char board[SIZE][SIZE])
     return moves;
 }
 
-// ===================== GREEDY =====================
-
 QPair<int,int> Bot::greedyMove(char board[SIZE][SIZE])
 {
     int bestScore = -1e9;
@@ -228,8 +218,6 @@ QPair<int,int> Bot::greedyMove(char board[SIZE][SIZE])
 
     return best.first == -1 ? randomMove(board) : best;
 }
-
-// ===================== ALPHA-BETA =====================
 
 QPair<int,int> Bot::alphaBetaMove(char board[SIZE][SIZE])
 {
@@ -289,8 +277,6 @@ QPair<int,int> Bot::alphaBetaMove(char board[SIZE][SIZE])
     return best.first==-1 ? randomMove(board) : best;
 }
 
-// ===================== CORE =====================
-
 int Bot::alphaBeta(char board[SIZE][SIZE], int depth,
                    int alpha, int beta, bool max,
                    int lastX, int lastY)
@@ -342,8 +328,6 @@ int Bot::alphaBeta(char board[SIZE][SIZE], int depth,
     return best;
 }
 
-// ===================== MINIMAX =====================
-
 QPair<int,int> Bot::minimaxMove(char board[SIZE][SIZE])
 {
     return alphaBetaMove(board);
@@ -351,9 +335,9 @@ QPair<int,int> Bot::minimaxMove(char board[SIZE][SIZE])
 
 bool Bot::isBoardFull(char board[SIZE][SIZE])
 {
-    for (int i=0;i<SIZE;i++)
-        for (int j=0;j<SIZE;j++)
-            if (board[i][j]==' ')
+    for (int i = 0; i < SIZE; i++)
+        for (int j = 0; j < SIZE; j++)
+            if (board[i][j] == ' ')
                 return false;
     return true;
 }

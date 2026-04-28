@@ -15,12 +15,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
+private:
     void handleButtonClick();
     void changeDifficulty(int index);
     void changeMode(int index);
 
-private:
     static const int SIZE = 10;
     static const int WIN_COUNT = 5;
 

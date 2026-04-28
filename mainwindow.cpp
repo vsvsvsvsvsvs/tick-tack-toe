@@ -22,7 +22,6 @@ void MainWindow::createBoard()
     QWidget *central = new QWidget(this);
     QVBoxLayout *mainLayout = new QVBoxLayout(central);
 
-    // ===== РЕЖИМ ИГРЫ =====
     modeBox = new QComboBox();
     modeBox->addItem("Player vs Bot");
     modeBox->addItem("Player vs Player");
@@ -36,7 +35,6 @@ void MainWindow::createBoard()
 
     mainLayout->addWidget(modeBox);
 
-    // ===== СЛОЖНОСТЬ =====
     difficultyBox = new QComboBox();
     difficultyBox->addItem("Random");
     difficultyBox->addItem("Greedy");
@@ -52,12 +50,10 @@ void MainWindow::createBoard()
 
     mainLayout->addWidget(difficultyBox);
 
-    // ===== ИНДИКАТОР ХОДА =====
     turnLabel = new QLabel();
     turnLabel->setText("Ход: X");
     mainLayout->addWidget(turnLabel);
 
-    // ===== ПОЛЕ =====
     QGridLayout *gridLayout = new QGridLayout();
 
     for (int i = 0; i < SIZE; i++)
@@ -101,7 +97,6 @@ void MainWindow::handleButtonClick()
         {
             if (buttons[i][j] == clicked && board[i][j] == ' ')
             {
-                // ===== PvP режим =====
                 if (isPvP)
                 {
                     board[i][j] = currentPlayer;
@@ -125,14 +120,12 @@ void MainWindow::handleButtonClick()
                         return;
                     }
 
-                    // смена игрока
                     currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
                     updateTurnLabel();
 
                     return;
                 }
 
-                // ===== PvBot =====
                 board[i][j] = 'X';
                 buttons[i][j]->setText("X");
 

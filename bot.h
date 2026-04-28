@@ -26,18 +26,15 @@ private:
 
     static const int SEARCH_RADIUS = 2;
 
-    // Уровни сложности
     static QPair<int, int> randomMove(char board[SIZE][SIZE]);
     static QPair<int, int> greedyMove(char board[SIZE][SIZE]);
     static QPair<int, int> minimaxMove(char board[SIZE][SIZE]);
     static QPair<int, int> alphaBetaMove(char board[SIZE][SIZE]);
 
-    // Генерация ходов
     static QVector<QPair<int, int>> generateCandidateMoves(
         char board[SIZE][SIZE]
     );
 
-    // Основной алгоритм (обновлённый!)
     static int alphaBeta(
         char board[SIZE][SIZE],
         int depth,
@@ -48,7 +45,6 @@ private:
         int lastY
     );
 
-    // Вспомогательные
     static bool isBoardFull(char board[SIZE][SIZE]);
 };
 
